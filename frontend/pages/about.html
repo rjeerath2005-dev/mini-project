@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Vivasayin Kanakku – About & Documentation</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    .about-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 30px;
+    }
+    @media(max-width:1024px) { .about-container { grid-template-columns: 1fr; } }
+    
+    .sidebar-nav {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-nav h4 { font-size: 13px; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+    .sidebar-nav a {
+      display: block;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      color: var(--text-mid);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-nav a:hover { background: var(--bg); color: var(--green-mid); border-left-color: var(--green-mid); }
+    .sidebar-nav a.active { background: var(--green-pale); color: var(--green-dark); font-weight: 600; border-left-color: var(--green-dark); }
+    
+    .content-section {
+      scroll-margin-top: 100px;
+    }
+    .content-section h2 {
+      font-size: 28px;
+      color: var(--text-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid var(--green-mid);
+    }
+    .content-section h3 {
+      font-size: 18px;
+      color: var(--green-dark);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+    .content-section p {
+      line-height: 1.7;
+      color: var(--text-mid);
+      margin-bottom: 12px;
+    }
+    
+    .about-me-card {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 30px;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .about-me-avatar { font-size: 80px; flex-shrink: 0; }
+    .about-me-text h2 { color: #fff; margin-bottom: 8px; font-size: 24px; }
+    .about-me-text p { color: rgba(255,255,255,0.9); margin: 4px 0; }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .feature-box {
+      background: var(--green-pale);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+    .feature-box .icon { font-size: 32px; margin-bottom: 8px; }
+    .feature-box h4 { font-weight: 600; color: var(--green-dark); margin-bottom: 6px; }
+    .feature-box p { font-size: 13px; color: var(--text-mid); }
+    
+    .toc-list {
+      background: #f9f9f9;
+      border-left: 4px solid var(--green-mid);
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      margin-top: 12px;
+    }
+    .toc-list ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .toc-list li {
+      margin-bottom: 8px;
+      color: var(--text-dark);
+    }
+    .toc-list li a {
+      color: var(--green-mid);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .toc-list li a:hover { text-decoration: underline; }
+    .toc-list li ul {
+      margin-top: 6px;
+      margin-left: 20px;
+      list-style-type: disc;
+    }
+    .toc-list li ul li { margin-bottom: 4px; font-size: 14px; }
+    
+    .tech-stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 16px 0;
+    }
+    .tech-column h4 { font-weight: 600; color: var(--green-dark); margin-bottom: 12px; }
+    .tech-list {
+      list-style: none;
+      padding: 0;
+    }
+    .tech-list li {
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .workflow-step {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--amber);
+    }
+    .workflow-step.complete { border-left-color: var(--green-mid); }
+    .workflow-step h4 { color: var(--text-dark); margin-bottom: 8px; }
+    .workflow-step p { font-size: 14px; color: var(--text-mid); margin: 0; }
+    
+    .highlight-box {
+      background: var(--blue-light);
+      border-left: 4px solid var(--blue);
+      padding: 14px;
+      border-radius: 6px;
+      margin: 16px 0;
+    }
+    .highlight-box strong { color: var(--blue); }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-icon">🌾</span>
+      <h1>Vivasayin Kanakku</h1>
+      <span>Smart Farm Management</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-item" data-page="dashboard"><span class="icon">📊</span><span class="nav-label">Dashboard</span></a>
+      <a href="tracker.html" class="nav-item" data-page="tracker"><span class="icon">💰</span><span class="nav-label">Expense & Income</span></a>
+      <a href="schemes.html" class="nav-item" data-page="schemes"><span class="icon">🏛️</span><span class="nav-label">Govt. Schemes</span></a>
+      <a href="tractors.html" class="nav-item" data-page="tractors"><span class="icon">🚜</span><span class="nav-label">Tractor Rental</span></a>
+      <a href="rentals.html" class="nav-item" data-page="rentals"><span class="icon">📋</span><span class="nav-label">Rental Ledger</span></a>
+      <a href="about.html" class="nav-item active" data-page="about"><span class="icon">ℹ️</span><span class="nav-label">About</span></a>
+    </nav>
+    <div class="sidebar-footer">Vivasayin Kanakku v1.0 · 2026</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrap">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mobile-toggle">☰</button>
+        <h2>ℹ️ About & Documentation</h2>
+      </div>
+      <div class="topbar-right">
+        <div class="farmer-badge"><div class="avatar">🧑‍🌾</div><span>Ram Patel</span></div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="about-container">
+        <!-- SIDEBAR NAV -->
+        <aside class="sidebar-nav">
+          <h4>📑 Table of Contents</h4>
+          <a href="#about-me" class="active">👤 About Me</a>
+          <a href="#project-overview">🎯 Project Overview</a>
+          <a href="#features">✨ Features</a>
+          <a href="#system-specs">⚙️ System Specs</a>
+          <a href="#tech-stack">💻 Tech Stack</a>
+          <a href="#modules">📦 Modules</a>
+          <a href="#workflows">🔄 Workflows</a>
+          <a href="#faq">❓ FAQ</a>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <article>
+
+          <!-- 1. ABOUT ME -->
+          <div class="content-section" id="about-me">
+            <div class="about-me-card">
+              <img src="../images/jeerath.jpeg" alt="Jeerath Kumar" style="width:120px;height:120px;border-radius:50%;object-fit:cover;flex-shrink:0;border:4px solid #fff;"/>
+              <div class="about-me-text">
+                <h2>About the Developer</h2>
+                <p><strong>👤 Name:</strong> Jeerath Kumar</p>
+                <p><strong>📍 Location:</strong> Ponnanthangal Village, Thiruvannamalai District</p>
+                <p><strong>🎓 Education:</strong> BCA (Bachelor of Computer Applications) - Year 3, Guru Nanak College</p>
+                <p><strong>🌾 Background:</strong> Member of a Farming Family</p>
+              </div>
+            </div>
+            
+            <h3>📖 My Story</h3>
+            <p>I belong to a farmer family, and I have personally witnessed the challenges and difficulties faced by farmers in our village. From financial struggles to lack of awareness about government schemes and modern technologies, farmers face many problems in managing their crops and income effectively.</p>
+            
+            <p>Being both a student of computer applications and a member of a farming family, I felt a strong responsibility to use my technical knowledge to create a solution that can help farmers. This project is developed with the aim of supporting farmers by providing useful information, tracking expenses, improving crop management, and creating awareness about government schemes.</p>
+            
+            <h3>🎯 Mission</h3>
+            <p>Through this project, I hope to make a small but meaningful contribution to the farming community and help improve the lives of farmers using technology. <strong>Vivasayin Kanakku</strong> is my effort to bridge the gap between modern technology and traditional farming, making farm management simple, efficient, and accessible to every farmer.</p>
+
+            <div class="highlight-box" style="background:#fff5e6;border-left-color:var(--amber);margin-top:20px;">
+              <strong style="color:var(--amber);">💡 Project Philosophy:</strong> Technology should empower farmers, not complicate their lives. Every feature in Vivasayin Kanakku is designed with actual farmer challenges in mind.
+            </div>
+          </div>
+
+          <!-- 2. PROJECT OVERVIEW -->
+          <div class="content-section" id="project-overview">
+            <h2>🎯 Project Overview</h2>
+            <p><strong>Vivasayin Kanakku</strong> (meaning "Farmer's Account" in Tamil) is a comprehensive web-based farm management system designed to help farmers track finances, manage tractor rentals, and stay informed about government schemes—all in one place.</p>
+            
+            <h3>Why This Project?</h3>
+            <p>Indian farmers often struggle with:</p>
+            <ul style="margin-left: 20px; color: var(--text-mid);">
+              <li>📊 Scattered financial records (cash books, notebooks)</li>
+              <li>🚜 Complex rental tracking for equipment</li>
+              <li>🏛️ Difficulty finding eligible government schemes</li>
+              <li>💰 Inability to analyze profitability by crop</li>
+              <li>📱 Limited digital literacy with complex software</li>
+            </ul>
+            <p><strong>Vivasayin Kanakku solves all these</strong> with a clean, farmer-friendly interface.</p>
+          </div>
+
+          <!-- 3. FEATURES -->
+          <div class="content-section" id="features">
+            <h2>✨ Core Features</h2>
+            <div class="feature-grid">
+              <div class="feature-box">
+                <div class="icon">📊</div>
+                <h4>Dashboard</h4>
+                <p>Real-time overview of income, expenses, profit/loss, and rental revenue</p>
+              </div>
+              <div class="feature-box">
+                <div class="icon">💰</div>
+                <h4>Finance Tracker</h4>
+                <p>Log expenses and income by crop with detailed categorization</p>
+              </div>
+              <div class="feature-box">
+                <div class="icon">🚜</div>
+                <h4>Tractor Rental</h4>
+                <p>Manage tractor fleet with hourly/daily rates and image upload</p>
+              </div>
+              <div class="feature-box">
+                <div class="icon">📋</div>
+                <h4>Rental Ledger</h4>
+                <p>Track all rentals, payments, and auto-calculate work duration</p>
+              </div>
+              <div class="feature-box">
+                <div class="icon">🏛️</div>
+                <h4>Govt. Schemes</h4>
+                <p>Browse available government subsidies and schemes with eligibility</p>
+              </div>
+              <div class="feature-box">
+                <div class="icon">📈</div>
+                <h4>Analytics</h4>
+                <p>Crop-wise profit analysis and seasonal trends</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. SYSTEM SPECIFICATIONS -->
+          <div class="content-section" id="system-specs">
+            <h2>⚙️ System Specifications</h2>
+            
+            <h3>Hardware Requirements</h3>
+            <ul style="margin-left: 20px; color: var(--text-mid);">
+              <li>✓ Any modern laptop, desktop, or tablet</li>
+              <li>✓ Minimum 2GB RAM</li>
+              <li>✓ Internet connection (for sync)</li>
+              <li>✓ Works offline with local caching</li>
+            </ul>
+
+            <h3>Browser Support</h3>
+            <ul style="margin-left: 20px; color: var(--text-mid);">
+              <li>✓ Chrome 90+</li>
+              <li>✓ Firefox 88+</li>
+              <li>✓ Safari 14+</li>
+              <li>✓ Edge 90+</li>
+              <li>✓ Mobile browsers (iOS Safari, Chrome Android)</li>
+            </ul>
+
+            <h3>Server Specifications</h3>
+            <ul style="margin-left: 20px; color: var(--text-mid);">
+              <li>✓ Python 3.8+</li>
+              <li>✓ Flask web framework</li>
+              <li>✓ JSON-based local storage</li>
+              <li>✓ CORS enabled for cross-domain requests</li>
+            </ul>
+          </div>
+
+          <!-- 5. TECH STACK -->
+          <div class="content-section" id="tech-stack">
+            <h2>💻 Technology Stack</h2>
+            <div class="tech-stack">
+              <div>
+                <h4>Frontend</h4>
+                <ul class="tech-list">
+                  <li><span>📄</span> HTML5</li>
+                  <li><span>🎨</span> CSS3 (Custom + Grid/Flexbox)</li>
+                  <li><span>⚡</span> Vanilla JavaScript ES6+</li>
+                  <li><span>🔤</span> Google Fonts (Mukta, Tiro Devanagari)</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Backend</h4>
+                <ul class="tech-list">
+                  <li><span>🐍</span> Python 3.8+</li>
+                  <li><span>🌐</span> Flask 2.0+</li>
+                  <li><span>📦</span> Flask-CORS</li>
+                  <li><span>💾</span> JSON file storage</li>
+                </ul>
+              </div>
+            </div>
+            <div class="highlight-box">
+              <strong>Design Philosophy:</strong> Minimal dependencies, maximum simplicity. No database required—all data stored as JSON files for easy backup and portability.
+            </div>
+          </div>
+
+          <!-- 6. MODULES -->
+          <div class="content-section" id="modules">
+            <h2>📦 Application Modules</h2>
+            
+            <h3>1️⃣ Dashboard Module</h3>
+            <p>Central hub displaying financial KPIs, crop profitability, and quick actions. Updates in real-time as data changes.</p>
+
+            <h3>2️⃣ Expense & Income Tracker</h3>
+            <p>Record daily farm activities with categorized expenses (seeds, fertilizer, labor) and income (crop sales by buyer). Automatic profit calculation.</p>
+
+            <h3>3️⃣ Tractor Management</h3>
+            <p>Add tractors with specifications (HP, year, rates). Upload tractor images. Mark as Available or Rented. Manage hourly and daily rental rates.</p>
+
+            <h3>4️⃣ Rental System</h3>
+            <p><strong>Two-Stage Workflow:</strong></p>
+            <ul style="margin-left: 20px; color: var(--text-mid);">
+              <li><strong>Stage 1:</strong> Farmer books rental with start time and advance payment</li>
+              <li><strong>Stage 2:</strong> When work completes, owner sets end time and system auto-calculates final amount</li>
+              <li><strong>Dynamic Pricing:</strong> ₹800/day or ₹100/hour, whichever applies</li>
+            </ul>
+
+            <h3>5️⃣ Rental Ledger</h3>
+            <p>Master record of all rentals with payment tracking, due amounts, and completion status. Shows active vs. completed rentals.</p>
+
+            <h3>6️⃣ Government Schemes</h3>
+            <p>Curated list of schemes from central and state governments with eligibility criteria, required documents, and application links.</p>
+          </div>
+
+          <!-- 7. WORKFLOWS -->
+          <div class="content-section" id="workflows">
+            <h2>🔄 Key Workflows</h2>
+            
+            <h3>📋 Rental Workflow (Two-Stage)</h3>
+            <div class="workflow-step">
+              <h4>Stage 1: Initial Booking</h4>
+              <p>1. Farmer visits Tractor page → Clicks "Rent Out"<br/>
+                 2. Enters: Renter name, phone, village, purpose, START TIME<br/>
+                 3. Records advance payment (e.g., ₹500)<br/>
+                 4. Clicks "Confirm Booking" → Rental created with end_date=null</p>
+            </div>
+            <div class="workflow-step">
+              <h4>Stage 2: Work Completion</h4>
+              <p>1. Later, opens Rental Ledger page<br/>
+                 2. Sees rental with 🟢 "Active" badge<br/>
+                 3. Clicks "Mark Complete" button<br/>
+                 4. Sets END TIME when work finishes<br/>
+                 5. System calculates: (2hr 30min = ₹250 @ ₹100/hr)<br/>
+                 6. Shows: Total ₹250, Already Paid ₹500, No Due<br/>
+                 7. Clicks "Mark Complete & Settle" → Rental completed</p>
+            </div>
+            <div class="workflow-step complete">
+              <h4>✅ Result</h4>
+              <p>Rental marked complete with final amount calculated. Tractor marked Available. Payment ledger updated.</p>
+            </div>
+
+            <h3>💰 Expense/Income Workflow</h3>
+            <div class="workflow-step">
+              <h4>Recording a Transaction</h4>
+              <p>1. Go to Expense & Income page<br/>
+                 2. Click "➕ Add Expense" or "💰 Add Income"<br/>
+                 3. Fill: Date, Crop, Category, Amount, Notes<br/>
+                 4. Submit → Dashboard updates automatically<br/>
+                 5. View trend in "Crop-wise Profit"</p>
+            </div>
+          </div>
+
+          <!-- 8. FAQ -->
+          <div class="content-section" id="faq">
+            <h2>❓ Frequently Asked Questions</h2>
+            
+            <h3>Q: Is my data backed up?</h3>
+            <p><strong>A:</strong> Data is stored in JSON files in the `backend/data/` folder. Regularly backup this folder to external storage or cloud.</p>
+
+            <h3>Q: Can I use this offline?</h3>
+            <p><strong>A:</strong> The system works best online. Offline functionality is planned for future versions.</p>
+
+            <h3>Q: How do I add my own schemes?</h3>
+            <p><strong>A:</strong> Admin can edit `backend/data/schemes.json` directly or future versions will have an admin panel.</p>
+
+            <h3>Q: Can multiple users use simultaneously?</h3>
+            <p><strong>A:</strong> Current version supports single-user. Multi-user support with farmer IDs is in roadmap.</p>
+
+            <h3>Q: How are rental rates calculated?</h3>
+            <p><strong>A:</strong> Default: ₹800/day or ₹100/hour. Set custom rates per tractor in Tractor Management.</p>
+
+            <h3>Q: What if payment extends beyond one day?</h3>
+            <p><strong>A:</strong> System combines: Full days @ ₹800 + remaining hours @ ₹100/hr. E.g., 2.5 days = (2 × ₹800) + (12 × ₹100) = ₹2,000</p>
+
+            <h3>Q: How do I export my data?</h3>
+            <p><strong>A:</strong> Data is already in JSON format. Copy files from `backend/data/` or use browser's export features.</p>
+          </div>
+
+          <!-- FOOTER INFO -->
+          <div style="margin-top: 40px; padding: 20px; background: var(--bg); border-radius: var(--radius); text-align: center; color: var(--text-light);">
+            <p><strong>Vivasayin Kanakku v1.0</strong> • Developed by Jeerath Kumar • 2026</p>
+            <p style="font-size: 12px; margin-top: 8px;">💚 Made with passion for Indian farmers • A BCA Project for Social Impact</p>
+          </div>
+
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script>
+    // Active link highlighting on scroll
+    const sections = document.querySelectorAll('.content-section');
+    const links = document.querySelectorAll('.sidebar-nav a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 150) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      links.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Smooth scroll
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
