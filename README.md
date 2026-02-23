@@ -10,10 +10,10 @@
 ---
 
 **Submitted by:**  
-DINESH ATHITHYA B A  
-Roll No: 70911  
+Jeerath Kumar R  
+Roll No: 70917 
 BCA – Sec C  
-Batch: 2023-28  
+Batch: 2023-26  
 
 **Under the guidance of**  
 [Guide Name]
@@ -555,7 +555,7 @@ The system uses **JSON file-based storage** (no SQL database). Each file corresp
                              │
                              ▼
 ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-│   Browser    │◄────►│  KisanSetu   │◄────►│  JSON Data   │
+│   Browser    │◄────►│  Vivasayin Kanakku   │◄────►│  JSON Data   │
 │ (Frontend)   │      │  (Flask API) │      │   Storage    │
 └──────────────┘      └──────────────┘      └──────────────┘
                              ▲
