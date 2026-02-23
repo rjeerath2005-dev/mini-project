@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>KisanSetu – Rental Ledger</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    .ledger-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      border-left: 5px solid var(--border);
+      transition: box-shadow 0.2s;
+    }
+    .ledger-card:hover { box-shadow: var(--shadow-hover); }
+    .ledger-card.paid { border-left-color: var(--green-mid); }
+    .ledger-card.partial { border-left-color: var(--amber); }
+    .ledger-card.pending { border-left-color: var(--red); }
+    .lc-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+    .lc-name { font-size: 17px; font-weight: 700; color: var(--text-dark); }
+    .lc-phone { font-size: 13px; color: var(--text-light); }
+    .lc-tractor { font-size: 13px; color: var(--green-mid); font-weight: 600; }
+    .lc-meta { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0; }
+    .lc-meta-item { font-size: 13px; color: var(--text-mid); }
+    .lc-meta-item strong { color: var(--text-dark); }
+    .pay-bar { background: var(--bg); border-radius: 6px; height: 8px; margin: 8px 0; overflow: hidden; }
+    .pay-fill { height: 100%; border-radius: 6px; background: var(--green-mid); transition: width 0.5s ease; }
+    .pay-fill.partial { background: var(--amber); }
+    .pay-fill.pending { background: var(--red); }
+    .lc-amounts { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; }
+    .lc-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .pay-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .pay-form input { width: 130px; }
+    .pay-form select { width: 100px; }
+    .summary-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 24px; }
+    .sum-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+    }
+    .sum-box .sv { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+    .sum-box .sl { font-size: 12px; color: var(--text-light); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-icon">🌾</span>
+      <h1>KisanSetu</h1>
+      <span>Smart Farm Management</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-item" data-page="dashboard"><span class="icon">📊</span><span class="nav-label">Dashboard</span></a>
+      <a href="tracker.html" class="nav-item" data-page="tracker"><span class="icon">💰</span><span class="nav-label">Expense & Income</span></a>
+      <a href="schemes.html" class="nav-item" data-page="schemes"><span class="icon">🏛️</span><span class="nav-label">Govt. Schemes</span></a>
+      <a href="tractors.html" class="nav-item" data-page="tractors"><span class="icon">🚜</span><span class="nav-label">Tractor Rental</span></a>
+      <a href="rentals.html" class="nav-item active" data-page="rentals"><span class="icon">📋</span><span class="nav-label">Rental Ledger</span></a>
+    </nav>
+    <div class="sidebar-footer">KisanSetu v1.0</div>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mobile-toggle">☰</button>
+        <h2>📋 Rental Ledger</h2>
+      </div>
+      <div class="topbar-right">
+        <div class="farmer-badge"><div class="avatar">🧑‍🌾</div><span>Ram Patel</span></div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <!-- Summary -->
+      <div class="summary-row" id="summaryRow">
+        <div class="sum-box"><div class="sv" style="color:var(--green-dark)" id="sTotal">—</div><div class="sl">Total Billed</div></div>
+        <div class="sum-box"><div class="sv" style="color:var(--green-mid)" id="sPaid">—</div><div class="sl">Collected</div></div>
+        <div class="sum-box"><div class="sv" style="color:var(--amber)" id="sPending">—</div><div class="sl">Pending / Due</div></div>
+        <div class="sum-box"><div class="sv" style="color:var(--blue)" id="sCount">—</div><div class="sl">Total Rentals</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar" style="margin-bottom:18px;">
+        <input type="text" id="searchRenter" placeholder="🔍 Search by name/tractor..." oninput="filterRentals()" style="width:230px;"/>
+        <select id="filterStatus" onchange="filterRentals()">
+          <option value="">All Status</option>
+          <option value="Paid">Paid</option>
+          <option value="Partial">Partial</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+
+      <div id="ledgerList">
+        <div class="empty-state"><div class="empty-icon">🔄</div><p>Loading rentals...</p></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script>
+    let allRentals = [];
+
+    async function loadRentals() {
+      const data = await apiFetch('/rentals');
+      if (!data) return;
+      allRentals = data.reverse(); // newest first
+
+      const total = data.reduce((s,r) => s + r.total_amount, 0);
+      const paid = data.reduce((s,r) => s + r.paid_amount, 0);
+      document.getElementById('sTotal').textContent = fmt(total);
+      document.getElementById('sPaid').textContent = fmt(paid);
+      document.getElementById('sPending').textContent = fmt(total - paid);
+      document.getElementById('sCount').textContent = data.length;
+
+      renderRentals(allRentals);
+    }
+
+    function filterRentals() {
+      const q = document.getElementById('searchRenter').value.toLowerCase();
+      const st = document.getElementById('filterStatus').value;
+      const filtered = allRentals.filter(r =>
+        (!st || r.payment_status === st) &&
+        (!q || r.renter_name.toLowerCase().includes(q) || (r.tractor_name||'').toLowerCase().includes(q) || (r.renter_village||'').toLowerCase().includes(q))
+      );
+      renderRentals(filtered);
+    }
+
+    function renderRentals(list) {
+      const el = document.getElementById('ledgerList');
+      if (!list.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No rental records found</p></div>';
+        return;
+      }
+
+      el.innerHTML = list.map(r => {
+        const st = (r.payment_status || 'Pending').toLowerCase();
+        const pct = r.total_amount > 0 ? Math.round((r.paid_amount / r.total_amount) * 100) : 0;
+        const due = r.total_amount - r.paid_amount;
+
+        const stBadge = {paid: 'badge-green', partial: 'badge-amber', pending: 'badge-red'}[st] || 'badge-gray';
+        const stLabel = {paid: '✅ Paid', partial: '⚠️ Partial', pending: '🔴 Pending'}[st] || r.payment_status;
+
+        return `
+        <div class="ledger-card ${st}">
+          <div class="lc-top">
+            <div>
+              <div class="lc-name">👤 ${r.renter_name}</div>
+              <div class="lc-phone">📞 ${r.renter_phone || '-'}  ${r.renter_village ? '📍 ' + r.renter_village : ''}</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="badge ${stBadge}">${stLabel}</span>
+              <button onclick="deleteRental(${r.id})" class="btn btn-danger btn-sm">🗑️</button>
+            </div>
+          </div>
+
+          <div class="lc-meta">
+            <div class="lc-meta-item">🚜 <strong>${r.tractor_name || 'Unknown Tractor'}</strong></div>
+            <div class="lc-meta-item">📅 <strong>${fmtDate(r.start_date)}</strong> → <strong>${fmtDate(r.end_date)}</strong></div>
+            <div class="lc-meta-item">⏱️ <strong>${r.days} day${r.days > 1 ? 's' : ''}</strong></div>
+            ${r.purpose ? `<div class="lc-meta-item">🌾 <strong>${r.purpose}</strong></div>` : ''}
+            ${r.payment_mode && r.payment_mode !== '-' ? `<div class="lc-meta-item">💳 <strong>${r.payment_mode}</strong></div>` : ''}
+          </div>
+
+          <div class="pay-bar">
+            <div class="pay-fill ${st}" style="width:${pct}%"></div>
+          </div>
+          <div class="lc-amounts">
+            <span style="color:var(--green-dark);font-weight:600;">Paid: ${fmt(r.paid_amount)}</span>
+            <span style="color:var(--text-light);">${pct}%</span>
+            <span style="color:${due > 0 ? 'var(--red)' : 'var(--green-mid)'};font-weight:600;">
+              ${due > 0 ? `Due: ${fmt(due)}` : `Total: ${fmt(r.total_amount)}`}
+            </span>
+          </div>
+
+          ${due > 0 ? `
+          <div class="lc-actions">
+            <span style="font-size:13px;color:var(--text-light);font-weight:600;">Update Payment:</span>
+            <div class="pay-form">
+              <input type="number" class="form-group input" id="payAmt_${r.id}" placeholder="Amount" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;" max="${due}"/>
+              <select id="payMode_${r.id}" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;">
+                <option>Cash</option><option>UPI</option><option>Cheque</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="recordPayment(${r.id}, ${r.paid_amount}, ${r.total_amount})">💰 Record</button>
+              ${due <= r.total_amount ? `<button class="btn btn-outline btn-sm" onclick="payFull(${r.id}, ${r.paid_amount}, ${r.total_amount}, '${r.id}')">✅ Full Pay</button>` : ''}
+            </div>
+          </div>` : `
+          <div style="color:var(--green-mid);font-size:13px;font-weight:600;">✅ Payment complete — ${fmt(r.total_amount)} received</div>`}
+
+          ${r.note ? `<div style="margin-top:8px;font-size:12px;color:var(--text-light);">📝 ${r.note}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    async function recordPayment(id, currentPaid, total) {
+      const amt = parseFloat(document.getElementById('payAmt_' + id).value);
+      if (!amt || amt <= 0) return showToast('Enter a valid amount', true);
+      const newPaid = Math.min(currentPaid + amt, total);
+      const mode = document.getElementById('payMode_' + id).value;
+      const res = await apiFetch('/rentals/' + id + '/pay', {
+        method: 'PUT',
+        body: JSON.stringify({ paid_amount: newPaid, payment_mode: mode })
+      });
+      if (res) { showToast('✅ Payment of ' + fmt(amt) + ' recorded!'); loadRentals(); }
+    }
+
+    async function payFull(id, currentPaid, total) {
+      const mode = document.getElementById('payMode_' + id)?.value || 'Cash';
+      const res = await apiFetch('/rentals/' + id + '/pay', {
+        method: 'PUT',
+        body: JSON.stringify({ paid_amount: total, payment_mode: mode })
+      });
+      if (res) { showToast('✅ Full payment marked!'); loadRentals(); }
+    }
+
+    async function deleteRental(id) {
+      if (!confirm('Delete this rental record?')) return;
+      await apiFetch('/rentals/' + id, { method: 'DELETE' });
+      showToast('Rental record deleted');
+      loadRentals();
+    }
+
+    loadRentals();
+  </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - KisanSetu</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .admin-wrap { padding: 28px; }
+    .login-card { max-width:420px; margin:40px auto; }
+    .scheme-row { display:flex;gap:10px;align-items:center; }
+    .scheme-row .actions { margin-left:auto; display:flex; gap:8px; }
+    .form-inline { display:flex; gap:8px; align-items:center; }
+    .list { margin-top:18px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-icon">🌾</span>
+      <h1>KisanSetu</h1>
+      <span>Admin</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-item" data-page="dashboard"><span class="icon">📊</span><span class="nav-label">Dashboard</span></a>
+      <a href="schemes.html" class="nav-item" data-page="schemes"><span class="icon">🏛️</span><span class="nav-label">Schemes</span></a>
+      <a href="admin.html" class="nav-item active" data-page="admin"><span class="icon">⚙️</span><span class="nav-label">Admin</span></a>
+    </nav>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;"><h2>Admin Dashboard</h2></div>
+      <div class="topbar-right"></div>
+    </header>
+    <main class="page-content admin-wrap">
+      <div id="loginArea" class="card login-card">
+        <div class="card-header"><h3>Admin Login</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label>Username</label><input id="adminUser" value="admin"/></div>
+          <div class="form-group"><label>Password</label><input id="adminPass" type="password"/></div>
+          <div class="form-actions"><button class="btn btn-primary" onclick="doLogin()">Login</button></div>
+        </div>
+      </div>
+
+      <div id="adminArea" style="display:none;">
+        <div class="card">
+          <div class="card-header"><h3>Manage Schemes</h3><div></div></div>
+          <div style="margin-top:8px;" class="card-body">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input id="newSchemeName" placeholder="Scheme name" />
+              <input id="newSchemeCategory" placeholder="Category" />
+              <button class="btn btn-primary" onclick="createScheme()">Add Scheme</button>
+              <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="list" id="schemeList">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script>
+  // Use relative API base for same-origin requests
+  const API_BASE = '/api';
+  let adminToken = null;
+
+  async function doLogin(){
+    const user = document.getElementById('adminUser').value;
+    const pass = document.getElementById('adminPass').value;
+    try{
+      const res = await fetch(API_BASE + '/admin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:user,password:pass})});
+      const j = await res.json();
+      if(res.ok){ adminToken = j.token; document.getElementById('loginArea').style.display='none'; document.getElementById('adminArea').style.display='block'; loadAdminSchemes(); }
+      else { alert(j.error || 'Login failed'); }
+    }catch(e){ alert('Error connecting to server'); }
+  }
+
+  async function loadAdminSchemes(){
+    try{
+      const res = await fetch(API_BASE + '/schemes');
+      const list = await res.json();
+      window._allSchemes = list || [];
+      renderList(list || []);
+    }catch(e){ document.getElementById('schemeList').textContent='Error loading'; }
+  }
+
+  function renderList(list){
+    const el = document.getElementById('schemeList');
+    if(!list.length) { el.innerHTML='<div class="empty-state" style="padding:12px;">No schemes</div>'; return; }
+    el.innerHTML = list.map(s=>{
+      return `<div class="scheme-row card" style="padding:10px;display:flex;align-items:center;gap:12px;">
+        <div style="flex:1">
+          <div style="font-weight:700">${s.name} <span style="font-size:12px;color:#666">(${s.category||''})</span></div>
+          <div style="font-size:12px;color:#666">${s.full_name||''}</div>
+          <div style="font-size:13px;color:#444;margin-top:6px">${s.benefit||''}</div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline" onclick="openEditModal(${s.id})">Edit</button>
+          <button class="btn btn-danger" onclick="deleteScheme(${s.id})">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function openCreateModal(){
+    openModalFor(null);
+  }
+
+  function openEditModal(id){
+    const s = (window._allSchemes||[]).find(x=>x.id===id);
+    openModalFor(s);
+  }
+
+  function openModalFor(s){
+    let overlay = document.getElementById('adminModal');
+    if(!overlay){
+      overlay = document.createElement('div');
+      overlay.id = 'adminModal';
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `<div class="modal"><div id="adminModalContent"></div></div>`;
+      document.body.appendChild(overlay);
+    }
+    const content = document.getElementById('adminModalContent');
+    const isNew = !s;
+    const data = s || { name:'', full_name:'', category:'', type:'', ministry:'', benefit:'', eligibility:'', documents:[], apply_link:'', description:'' };
+    content.innerHTML = `
+      <div class="modal-header"><h3>${isNew? 'Create' : 'Edit'} Scheme</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+      <div style="display:grid;gap:8px;">
+        <input id="m_name" placeholder="Short name" value="${escapeHtml(data.name)}" />
+        <input id="m_full" placeholder="Full name" value="${escapeHtml(data.full_name||'')}" />
+        <input id="m_category" placeholder="Category" value="${escapeHtml(data.category||'')}" />
+        <input id="m_type" placeholder="Type" value="${escapeHtml(data.type||'')}" />
+        <input id="m_ministry" placeholder="Ministry" value="${escapeHtml(data.ministry||'')}" />
+        <input id="m_benefit" placeholder="Benefit" value="${escapeHtml(data.benefit||'')}" />
+        <input id="m_elig" placeholder="Eligibility" value="${escapeHtml(data.eligibility||'')}" />
+        <input id="m_docs" placeholder="Documents (comma separated)" value="${(data.documents||[]).map(escapeHtml).join(', ')}" />
+        <input id="m_apply" placeholder="Apply link" value="${escapeHtml(data.apply_link||'')}" />
+        <textarea id="m_desc" placeholder="More info">${escapeHtml(data.description||'')}</textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveModal(${data.id||0})">Save</button>
+        </div>
+      </div>
+    `;
+    overlay.classList.add('open');
+  }
+
+  function closeModal(){ const o=document.getElementById('adminModal'); if(o) o.classList.remove('open'); }
+
+  function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+  async function saveModal(id){
+    const payload = {
+      name: document.getElementById('m_name').value,
+      full_name: document.getElementById('m_full').value,
+      category: document.getElementById('m_category').value,
+      type: document.getElementById('m_type').value,
+      ministry: document.getElementById('m_ministry').value,
+      benefit: document.getElementById('m_benefit').value,
+      eligibility: document.getElementById('m_elig').value,
+      documents: document.getElementById('m_docs').value.split(',').map(x=>x.trim()).filter(x=>x),
+      apply_link: document.getElementById('m_apply').value,
+      description: document.getElementById('m_desc').value
+    };
+    const headers = { 'Content-Type':'application/json', 'Authorization':'Bearer ' + adminToken };
+    try{
+      let res;
+      if(id && id>0){ res = await fetch(API_BASE + '/admin/schemes/' + id, { method:'PUT', headers, body: JSON.stringify(payload) }); }
+      else { res = await fetch(API_BASE + '/admin/schemes', { method:'POST', headers, body: JSON.stringify(payload) }); }
+      if(res.ok){ closeModal(); loadAdminSchemes(); }
+      else { const j=await res.json(); alert(j.error||'Save failed'); }
+    }catch(e){ alert('Error saving'); }
+  }
+
+  async function deleteScheme(id){
+    if(!confirm('Delete scheme '+id+'?')) return;
+    try{
+      const res = await fetch(API_BASE + '/admin/schemes/' + id, { method:'DELETE', headers: { 'Authorization':'Bearer '+adminToken } });
+      if(res.ok) loadAdminSchemes(); else { const j=await res.json(); alert(j.error||'Failed'); }
+    }catch(e){ alert('Error'); }
+  }
+
+  function logout(){
+    fetch(API_BASE + '/admin/logout', {method:'POST', headers:{'Authorization':'Bearer '+adminToken}}).finally(()=>{ adminToken=null; document.getElementById('loginArea').style.display='block'; document.getElementById('adminArea').style.display='none'; });
+  }
+</script>
+</body>
+</html>

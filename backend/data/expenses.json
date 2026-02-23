@@ -1,0 +1,75 @@
+[
+  {
+    "id": 1,
+    "crop": "Wheat",
+    "category": "Seeds",
+    "amount": 3500,
+    "date": "2024-11-01",
+    "season": "Rabi 2024",
+    "note": "HYV seeds from govt shop"
+  },
+  {
+    "id": 2,
+    "crop": "Wheat",
+    "category": "Fertilizer",
+    "amount": 2800,
+    "date": "2024-11-15",
+    "season": "Rabi 2024",
+    "note": "Urea + DAP"
+  },
+  {
+    "id": 3,
+    "crop": "Wheat",
+    "category": "Labor",
+    "amount": 5000,
+    "date": "2024-12-01",
+    "season": "Rabi 2024",
+    "note": "Sowing labor"
+  },
+  {
+    "id": 4,
+    "crop": "Rice",
+    "category": "Irrigation",
+    "amount": 1200,
+    "date": "2024-07-10",
+    "season": "Kharif 2024",
+    "note": "Pump electricity"
+  },
+  {
+    "id": 5,
+    "crop": "Rice",
+    "category": "Pesticide",
+    "amount": 900,
+    "date": "2024-08-05",
+    "season": "Kharif 2024",
+    "note": "Fungicide spray"
+  },
+  {
+    "crop": "wheat",
+    "category": "Irrigation",
+    "amount": 2000,
+    "date": "2026-02-22",
+    "season": "Kharif 2024",
+    "note": "",
+    "id": 6
+  },
+  {
+    "crop": "wheat",
+    "category": "Pesticide",
+    "amount": 1200,
+    "date": "2026-02-23",
+    "season": "Kharif 2024",
+    "note": "",
+    "id": 7
+  },
+  {
+    "crop": "wheat",
+    "category": "Fertilizer",
+    "amount": 50000,
+    "date": "2026-02-23",
+    "season": "Kharif 2024",
+    "note": "",
+    "farmer_id": 2,
+    "id": 8
+  }
+]
