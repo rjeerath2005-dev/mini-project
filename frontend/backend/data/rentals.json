@@ -1,0 +1,18 @@
+[
+  {
+    "tractor_id": 3,
+    "renter_name": "ranak",
+    "renter_phone": "1234567890",
+    "renter_village": "nsh",
+    "purpose": "ploughinf",
+    "start_date": "2026-02-24T03:14",
+    "end_date": "2026-02-24T00:45:00.000Z",
+    "total_amount": 400,
+    "paid_amount": 500,
+    "payment_mode": "Cash",
+    "id": 1,
+    "days": 0,
+    "tractor_name": "John Deere 5050 D",
+    "payment_status": "Paid"
+  }
+]

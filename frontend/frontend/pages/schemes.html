@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Vivasayin Kanakku – Government Schemes</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    .scheme-card { border-top-color: var(--green-mid); }
+    .scheme-card[data-cat="Insurance"] { border-top-color: var(--blue); }
+    .scheme-card[data-cat="Credit"] { border-top-color: var(--amber); }
+    .scheme-card[data-cat="Machinery"] { border-top-color: #8b5cf6; }
+    .scheme-card[data-cat="Energy"] { border-top-color: #f59e0b; }
+    .scheme-card[data-cat="Market Access"] { border-top-color: #06b6d4; }
+    .hero-bar {
+      background: linear-gradient(135deg, #1a4d2e, #2d7a4f);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hero-bar h2 { font-size: 20px; margin-bottom: 4px; }
+    .hero-bar p { font-size: 13px; opacity: 0.8; }
+    .count-badge {
+      background: rgba(255,255,255,0.15);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .cat-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .cat-pill {
+      padding: 6px 16px;
+      border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-mid);
+    }
+    .cat-pill.active, .cat-pill:hover {
+      background: var(--green-dark);
+      color: #fff;
+      border-color: var(--green-dark);
+    }
+    .apply-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: var(--green-mid);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .apply-btn:hover { background: var(--green-dark); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-icon">🌾</span>
+      <h1>Vivasayin Kanakku</h1>
+      <span>Smart Farm Management</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-item" data-page="dashboard"><span class="icon">📊</span><span class="nav-label">Dashboard</span></a>
+      <a href="tracker.html" class="nav-item" data-page="tracker"><span class="icon">💰</span><span class="nav-label">Expense & Income</span></a>
+      <a href="schemes.html" class="nav-item active" data-page="schemes"><span class="icon">🏛️</span><span class="nav-label">Govt. Schemes</span></a>
+      <a href="tractors.html" class="nav-item" data-page="tractors"><span class="icon">🚜</span><span class="nav-label">Tractor Rental</span></a>
+      <a href="rentals.html" class="nav-item" data-page="rentals"><span class="icon">📋</span><span class="nav-label">Rental Ledger</span></a>
+      <a href="about.html" class="nav-item" data-page="about"><span class="icon">ℹ️</span><span class="nav-label">About</span></a>
+    </nav>
+    <div class="sidebar-footer">Vivasayin Kanakku v1.0</div>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mobile-toggle">☰</button>
+        <h2>🏛️ Government Schemes</h2>
+      </div>
+      <div class="topbar-right">
+        <div class="farmer-badge"><div class="avatar">🧑‍🌾</div><span>Ram Patel</span></div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="hero-bar">
+        <div>
+          <h2>🇮🇳 Farmer Welfare Schemes</h2>
+          <p>Central & State government programs for agricultural support</p>
+        </div>
+        <div class="count-badge" id="schemeCount">Loading...</div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="searchScheme" placeholder="🔍 Search schemes..." style="width:220px;" oninput="filterSchemes()"/>
+      </div>
+
+      <div class="cat-filters" id="catFilters">
+        <span class="cat-pill active" onclick="filterByCategory(this, '')">All</span>
+        <span class="cat-pill" onclick="filterByCategory(this, 'Income Support')">💵 Income Support</span>
+        <span class="cat-pill" onclick="filterByCategory(this, 'Insurance')">🛡️ Insurance</span>
+        <span class="cat-pill" onclick="filterByCategory(this, 'Credit')">🏦 Credit</span>
+        <span class="cat-pill" onclick="filterByCategory(this, 'Machinery')">⚙️ Machinery</span>
+        <span class="cat-pill" onclick="filterByCategory(this, 'Energy')">⚡ Energy</span>
+        <span class="cat-pill" onclick="filterByCategory(this, 'Market Access')">🛒 Market Access</span>
+      </div>
+
+      <div class="scheme-grid" id="schemeGrid">
+        <div class="empty-state"><div class="empty-icon">🔄</div><p>Loading schemes...</p></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script>
+    let allSchemes = [];
+    let activeCat = '';
+
+    async function loadSchemes() {
+      const data = await apiFetch('/schemes');
+      if (!data) return;
+      allSchemes = data;
+      renderSchemes(allSchemes);
+    }
+
+    function renderSchemes(list) {
+      document.getElementById('schemeCount').textContent = list.length + ' Schemes';
+      const grid = document.getElementById('schemeGrid');
+      if (!list.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>No schemes match your filter</p></div>';
+        return;
+      }
+      const catColors = {
+        'Income Support':'badge-green','Insurance':'badge-blue','Credit':'badge-amber',
+        'Machinery':'badge-gray','Energy':'badge-amber','Market Access':'badge-blue'
+      };
+      grid.innerHTML = list.map(s => `
+        <div class="scheme-card" data-cat="${s.category}" onclick="openSchemeModal(${s.id})" role="button" tabindex="0">
+          <div class="scheme-tag">
+            <span class="badge ${catColors[s.category]||'badge-gray'}">${s.category}</span>
+            <span class="badge badge-gray">${s.type}</span>
+          </div>
+          <div class="scheme-name">${s.name}</div>
+          <div class="scheme-full">${s.full_name || ''}</div>
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">🏛️ ${s.ministry || ''}</div>
+          <div class="scheme-benefit">✅ ${s.benefit || s.description || ''}</div>
+          <div style="font-size:13px;color:var(--text-mid);margin-bottom:10px;">
+            <strong>Eligibility:</strong> ${s.eligibility || ''}
+          </div>
+          <div class="scheme-docs">
+            <h5>📄 Required Documents:</h5>
+            ${(s.documents||[]).map(d => `<span class="doc-pill">📌 ${d}</span>`).join('')}
+          </div>
+          <a href="${s.apply_link || '#'}" target="_blank" class="apply-btn">Apply Now →</a>
+        </div>`).join('');
+    }
+
+    // Modal functions
+    function openSchemeModal(id) {
+      const s = allSchemes.find(x => x.id === id);
+      if (!s) return;
+      const overlay = document.getElementById('modalOverlay');
+      const content = document.getElementById('modalContent');
+      content.innerHTML = `
+        <div class="modal-header"><h3>${s.name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px;">${s.full_name || ''}</div>
+        <p style="margin-bottom:10px;">🏛️ <strong>Ministry:</strong> ${s.ministry || s.category || '-'}</p>
+        <p style="margin-bottom:10px;"><strong>Type:</strong> ${s.type || '-'}</p>
+        <p style="margin-bottom:12px;"><strong>Benefit:</strong> ${s.benefit || s.description || '-'}</p>
+        <p style="margin-bottom:12px;"><strong>Eligibility:</strong> ${s.eligibility || '-'}</p>
+        <div style="margin-bottom:12px;"><strong>Required Documents:</strong><div style="margin-top:6px;">${(s.documents||[]).map(d=>`<div class=\"doc-pill\">📌 ${d}</div>`).join('')}</div></div>
+        <p style="margin-bottom:12px;color:var(--text-light);"><strong>More info:</strong> ${s.more_info || s.description || '-'}</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;"><a class="apply-btn" href="${s.apply_link || '#'}" target="_blank">Apply Now</a><button class="btn btn-outline" onclick="closeModal()">Close</button></div>
+      `;
+      overlay.classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function filterSchemes() {
+      const q = document.getElementById('searchScheme').value.toLowerCase();
+      const filtered = allSchemes.filter(s =>
+        (!activeCat || s.category === activeCat) &&
+        (s.name.toLowerCase().includes(q) || s.full_name.toLowerCase().includes(q) || s.benefit.toLowerCase().includes(q))
+      );
+      renderSchemes(filtered);
+    }
+
+    function filterByCategory(el, cat) {
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      activeCat = cat;
+      filterSchemes();
+    }
+
+    loadSchemes();
+  </script>
+
+  <!-- Modal overlay for scheme details -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div id="modalContent"></div>
+    </div>
+  </div>
+</body>
+</html>
